@@ -2,21 +2,22 @@ import React, { useEffect, useState } from "react";
 
 import "../assets/styles/listExpenses.css";
 
+
 import SingleExpense from "./SingleExpenses";
 import addIcon from "../assets/imgs/add.png";
 import addIconHover from "../assets/imgs/addHover.png";
 
 import { useNavigate } from "react-router-dom";
 
-const ListExpenses = ({ expenses = [], categories, selectedCategory }) => {
+const ListExpenses = ({ expenses = [], categories, selectedCategory,didUpdate,setDidUpdate }) => {
+  console.log("expenses",expenses);
   const [filteredExpenses, setFilteredExpenses] = useState(expenses);
-  const navigate = useNavigate();
   const [addBtnHovered, setAddBtnHovered] = useState(false);
+  const navigate = useNavigate();
   var total=0
   for(let i=0;i<expenses.length;i++){
     total+=Number(expenses[i].price)
   }
-
 
   useEffect(() => {
     if (selectedCategory.id === "0") {
@@ -27,26 +28,24 @@ const ListExpenses = ({ expenses = [], categories, selectedCategory }) => {
       );
       setFilteredExpenses(tempExpenses);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory,didUpdate]);
   return (
     <div>
       <div className="expensesContainer">
-      <div className="totalPriceWrapper">
+        <div className="totalPriceWrapper">
           <p><span>Toplam: </span><span>{total} &#8378;</span></p>
         </div>
         <button
           onMouseEnter={() => setAddBtnHovered(true)}
           onMouseLeave={() => setAddBtnHovered(false)}
           onClick={() => navigate("/add-expense")}
-          className="addBtn"
-        >
+          className="addBtn">
           {addBtnHovered === true ? (
             <img src={addIconHover} />
           ) : (
             <img src={addIcon} />
           )}
         </button>
-
         <div className="expensesWrapper">
           {filteredExpenses.length === 0 ? (
             <div className="emptyList">
@@ -59,6 +58,8 @@ const ListExpenses = ({ expenses = [], categories, selectedCategory }) => {
                   categories={categories}
                   key={expense.id}
                   expense={expense}
+                  didUpdate={didUpdate}
+                  setDidUpdate={setDidUpdate}
                 />
               ))}
             </>

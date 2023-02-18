@@ -1,8 +1,8 @@
 import React from "react";
 
-
-
 import "../assets/styles/categoryList.css";
+
+import {Link} from "react-router-dom"
 
 const CategoriesList = ({
   categories = [],
@@ -29,8 +29,12 @@ const CategoriesList = ({
             {category.name}
           </p>
         ))}
+        <div className="categoryOperationLinkWrapper">
+            <Link to={"/category-operations"}>Kategori İşlemleri &rarr;</Link>
+        </div>
       </div>
     </div>
   );
 };
-export default CategoriesList
+
+export default CategoriesList;

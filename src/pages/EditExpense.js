@@ -1,42 +1,47 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import Header from "../components/Header";
-
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import GeneralModal from "../components/GeneralModal";
 import "../assets/styles/addExpense.css";
-import { useNavigate } from "react-router-dom";
 
-const AddExpense = () => {
+const EditExpense = () => {
+  const params = useParams();
   const navigate = useNavigate();
-  var year = new Date().getFullYear();
-  var month = new Date().getMonth() + 1;
-  if (month < 10) month = `0${month}`;
-  var date = new Date().getDate();
-  if (date < 10) date = `0${date}`;
-
+  const [expense, setExpense] = useState(null);
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const [form, setForm] = useState({
     price: "",
     place: "",
     title: "",
     description: "",
-    date: `${year}-${month}-${date}`,
+    date: "",
     categoryId: "",
   });
   const [categories, setCategories] = useState(null);
-
+  const [showSuccessModal,setShowSuccessModal]=useState(false)
   useEffect(() => {
     axios
-      .get(" http://localhost:3004/categories")
-      .then((res) => {
-        setCategories(res.data);
+      .get(`http://localhost:3004/expenses/${params.expenseId}`)
+      .then((resExpense) => {
+        axios
+          .get("http://localhost:3004/categories")
+          .then((resCat) => {
+            setExpense(resExpense.data);
+            setCategories(resCat.data);
+            setForm(resExpense.data)
+          })
+          .catch((err) => {});
       })
-      .catch((err) => {});
+      .catch((err) => {
+        setShowErrorModal(true);
+      });
   }, []);
-
-  const handelSubmit = (event) => {
+  const handleSubmit = (event) => {
     event.preventDefault();
-
+    console.log(form);
+    /* validation */
     if (
       form.price === "" ||
       form.title === "" ||
@@ -49,25 +54,31 @@ const AddExpense = () => {
       alert("Bütün alanlar zorunludur");
       return;
     }
-
-    axios
-      .post(" http://localhost:3004/expenses", {
-        ...form,
-        id: String(new Date().getTime()),
-      })
-      .then((res) => {
-        navigate("/");
-      })
-      .catch((err) => {});
+    /* API Call */
+    axios.put(`http://localhost:3004/expenses/${params.expenseId}`,form)
+    .then(res=>{
+      setShowSuccessModal(true)
+    })
+    .catch(err=>{setShowErrorModal(true)})
   };
 
-  if (categories === null) return null;
-
+  if (expense === null && showErrorModal === false && categories === null)
+    return null;
+  if (showErrorModal === true) {
+    return (
+      <GeneralModal
+        title="Hata"
+        content="Bir hata oluştu. Daha sonra tekrar deneyiniz."
+        closeButtonText="Anasayfaya Dön"
+        closeButtonClick={() => navigate("/")}
+      />
+    );
+  }
   return (
     <div>
-      <Header whichPage={"addExpense"} navigateTo="/" />
+      <Header whichPage={"editExpense"} navigateTo="/" />
       <div className="formWrapper">
-        <form onSubmit={handelSubmit}>
+        <form onSubmit={handleSubmit}>
           <div className="formElement">
             <label htmlFor="price">Fiyat</label>
             <input
@@ -124,30 +135,39 @@ const AddExpense = () => {
             />
           </div>
           <div className="formElement">
-            <label htmlFor="date">Katego</label>
+            <label htmlFor="date">Kategori</label>
             <select
+              defaultValue={form.categoryId}
               onChange={(event) =>
                 setForm({ ...form, categoryId: event.target.value })
-              }
-            >
+              }>
               <option value={"empty"}>Kategori Seçin</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
-                  {category.name}{" "}
+                  {category.name}
                 </option>
               ))}
             </select>
           </div>
-
-          <div className="sumbitBtnWrapper">
+          <div className="submitBtnWrapper">
             <button className="submitBtn" type="submit">
               Kaydet
             </button>
           </div>
         </form>
       </div>
+      {
+        showSuccessModal === true && (
+          <GeneralModal
+            title="Başarılı"
+            content="Güncelleme işlemi başarıyla gerçekleşti"
+            closeButtonText="Anasayfaya Dön"
+            closeButtonClick={()=>navigate("/")}
+          />
+        )
+      }
     </div>
   );
 };
 
-export default AddExpense;
+export default EditExpense;
