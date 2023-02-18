@@ -1,7 +1,3 @@
-.formWrapper{
-    
-    
-}
 .formWrapper form{
     width: 60%;
     margin: 0 auto;
@@ -15,22 +11,22 @@
     align-items: center;
     margin-bottom: 30px;
 }
-.formElement label{
+.formElement label {
     flex: 1;
 }
 .formElement input, .formElement select{
     flex: 2;
-  padding: 4px 10px;
-  font-size: 16px;
-  border-radius: 4px;
-  border: 1px solid rgba(0,0,0,0.4);
+    padding: 4px 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid rgba(0,0,0,0.4);
 }
 .formElement input:focus, .formElement select:focus{
     border: none;
     border: 1px solid rgb(213, 150, 92);
     outline: 1px solid rgb(213, 150, 92);
 }
-.sumbitBtnWrapper{
+.submitBtnWrapper{
     display: flex;
     justify-content: center;
 }
