@@ -6,15 +6,20 @@ import Header from "../components/Header";
 
 import axios from "axios";
 
+import GeneralModal from "../components/GeneralModal";
+
 import addIcon from "../assets/imgs/add.png";
 import addIconHover from "../assets/imgs/addHover.png";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 
 const CategoryOperations = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState(null);
   const [addBtnHovered, setAddBtnHovered] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [willDeleteCategory, setWillDeleteCategory] = useState("");
+  const [didUpdate,setDidUpdate]=useState(false)
   useEffect(() => {
     axios
       .get("http://localhost:3004/categories")
@@ -22,7 +27,16 @@ const CategoryOperations = () => {
         setCategories(res.data);
       })
       .catch((err) => {});
-  }, []);
+  }, [didUpdate]);
+
+  const deleteCategory = (id) => {
+    axios.delete(`http://localhost:3004/categories/${id}`)
+    .then((res)=>{
+     setOpenDeleteModal(false)
+     setDidUpdate(!didUpdate)
+    })
+    .catch((err)=>{})
+  };
   if (categories === null) return null;
   return (
     <div>
@@ -32,7 +46,8 @@ const CategoryOperations = () => {
           onClick={() => navigate("/add-category")}
           className="addBtnCategoryOperations"
           onMouseLeave={() => setAddBtnHovered(false)}
-          onMouseEnter={() => setAddBtnHovered(true)}>
+          onMouseEnter={() => setAddBtnHovered(true)}
+        >
           {addBtnHovered === false ? (
             <img src={addIcon} />
           ) : (
@@ -46,14 +61,38 @@ const CategoryOperations = () => {
               {categories.map((category) => (
                 <div
                   className="categoryOperationsCategoryWrapper"
-                  key={category.id}>
+                  key={category.id}
+                >
                   <p>{category.name}</p>
+                  <div>
+                    <button
+                      onClick={() => {
+                        setOpenDeleteModal(true);
+                        setWillDeleteCategory(category.id);
+                      }}
+                      className="deleteBtn"
+                    >
+                      Sil
+                    </button>
+                    <Link to={`/edit-category/${category.id}`} className="editBtn">Güncelle</Link>
+                  </div>
                 </div>
               ))}
             </>
           )}
         </div>
       </div>
+      {openDeleteModal && (
+        <GeneralModal
+          title="Kategori Sil"
+          content="Kategori silindiğinde kategoriye ait bütün harcama verileri de silinir. Devam etmek istediğinize emin misiniz ?"
+          closeButtonText="Vazgeç"
+          closeButtonClick={() => setOpenDeleteModal(false)}
+          confirmButtonText="Sil"
+          confirmButtonClick={() => deleteCategory(willDeleteCategory)}
+          hasConfirm={true}
+        />
+      )}
     </div>
   );
 };

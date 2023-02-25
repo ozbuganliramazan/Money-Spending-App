@@ -13,6 +13,13 @@
 .categoryOperationsCategoryWrapper{
     padding: 20px;
     border-bottom: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+}
+.categoryOperationsCategoryWrapper a{
+    text-decoration: none;
+    font-size: 13px;
+
 }
 .addBtnCategoryOperations{
     position: absolute;
@@ -34,4 +41,26 @@
 .addBtn:hover {
     transform: scale(1.05);
     
+}
+.deleteBtn{
+    border: none;
+    padding: 5px 10px;
+    background-color: palevioletred;
+    color: white;
+  cursor: pointer;
+}
+.deleteBtn:hover{
+    background-color: red;
+    color: black;
+}
+.editBtn{
+border: none;
+padding: 5px 10px;
+background-color: gray;
+color: aliceblue;
+cursor: pointer;
+}
+.editBtn:hover{
+background-color: yellowgreen;
+
 }
